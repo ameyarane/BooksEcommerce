@@ -5,6 +5,21 @@ Backend/.vs/
 *.user
 *.suo
 
+Backend/BooksEcommerce.Api/bin/
+Backend/BooksEcommerce.Api/obj/
+Backend/BooksEcommerce.Core/bin/
+Backend/BooksEcommerce.Core/obj/
+Backend/BooksEcommerce.Data/bin/
+Backend/BooksEcommerce.Data/obj/
+Backend/BooksEcommerce.Tests/bin/
+Backend/BooksEcommerce.Tests/obj/
+
+
+# Ignore all bin and obj folders for any subproject
+**/bin/
+**/obj/
+
+
 # Frontend Node/React
 Frontend/node_modules/
 Frontend/build/

@@ -11,9 +11,9 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["BooksEcommerce.Api/BooksEcommerce.Api.csproj", "BooksEcommerce.Api/"]
-COPY ["BooksEcommerce.Core/BooksEcommerce.Core.csproj", "BooksEcommerce.Core/"]
-COPY ["BooksEcommerce.Data/BooksEcommerce.Data.csproj", "BooksEcommerce.Data/"]
+COPY ["Backend/BooksEcommerce.Api/BooksEcommerce.Api.csproj", "BooksEcommerce.Api/"]
+COPY ["Backend/BooksEcommerce.Core/BooksEcommerce.Core.csproj", "BooksEcommerce.Core/"]
+COPY ["Backend/BooksEcommerce.Data/BooksEcommerce.Data.csproj", "BooksEcommerce.Data/"]
 RUN dotnet restore "./BooksEcommerce.Api/BooksEcommerce.Api.csproj"
 COPY . .
 WORKDIR "/src/BooksEcommerce.Api"
