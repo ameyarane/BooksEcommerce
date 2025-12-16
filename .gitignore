@@ -1,0 +1,16 @@
+# Backend .NET
+Backend/bin/
+Backend/obj/
+Backend/.vs/
+*.user
+*.suo
+
+# Frontend Node/React
+Frontend/node_modules/
+Frontend/build/
+Frontend/.env
+
+# Logs, system files
+*.log
+.DS_Store
+Thumbs.db

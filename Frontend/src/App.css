@@ -1,0 +1,80 @@
+body {
+  background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.App {
+  max-width: 760px;
+  margin: 48px auto;
+  background: #fff;
+  padding: 36px 28px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(120,60,180,0.12);
+}
+
+h1 {
+  text-align: center;
+  font-weight: 700;
+  color: #6228d7;
+  font-size: 2.5em;
+  letter-spacing: 1px;
+  margin-bottom: 36px;
+}
+
+.books-catalog-title {
+  font-size: 1.6em;
+  font-weight: 700;
+  color: #4621c5;
+  margin-top: 32px;
+  margin-bottom: 18px;
+}
+
+.books-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: linear-gradient(90deg, #eaf6ff 0%, #f0e6ff 100%);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(70, 33, 197, 0.06);
+}
+
+.books-table th, .books-table td {
+  padding: 14px 10px;
+  text-align: left;
+}
+
+.books-table th {
+  background: #e2d4fa;
+  color: #4c1ca6;
+  font-size: 1.09em;
+  font-weight: 600;
+  border-bottom: 2px solid #d7bfff;
+}
+
+.books-table tr:nth-child(even) {
+  background: #f5f7ff;
+}
+
+.books-table tr:hover {
+  background: #f7e8ff;
+  transition: background 0.2s;
+}
+
+.books-table td {
+  font-size: 1.06em;
+  color: #22214a;
+}
+
+@media (max-width: 800px) {
+  .App {
+    padding: 16px 4px;
+    max-width: 100%;
+  }
+  h1 {
+    font-size: 2em;
+  }
+  .books-table th, .books-table td {
+    padding: 10px 6px;
+    font-size: 1em;
+  }
+}
