@@ -12,5 +12,15 @@ namespace BooksEcommerce.Data
     {
         public BooksDbContext(DbContextOptions<BooksDbContext> options) : base(options) { }
         public DbSet<Book> Books { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Specify decimal precision for Price property
+            modelBuilder.Entity<Book>()
+                .Property(b => b.Price)
+                .HasColumnType("decimal(18,2)");
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }
