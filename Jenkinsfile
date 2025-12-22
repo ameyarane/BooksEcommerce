@@ -13,7 +13,7 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        git 'https://github.com/ameyarane/BooksEcommerce.git' // <-- your repository URL
+        git branch: 'main', url: 'https://github.com/ameyarane/BooksEcommerce.git'
       }
     }
     stage('Backend Build & Push') {
