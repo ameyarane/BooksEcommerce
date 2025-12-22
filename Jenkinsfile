@@ -35,7 +35,7 @@ pipeline {
       }
     }
 
-     stage('Verify AWS Auth') {
+    stage('Verify AWS Auth') {
             steps {
                     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
                                     credentialsId: 'aws-main-creds']]) {
@@ -44,18 +44,19 @@ pipeline {
           }
       }
 
-
-    stage('Deploy to EKS') {
-      steps {
-        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: env.AWS_CREDENTIALS]]) {
-          sh '''
-            aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
-            kubectl set image deployment/books-backend books-backend=$ECR_BACKEND:latest -n $K8S_NAMESPACE
-            kubectl set image deployment/books-frontend books-frontend=$ECR_FRONTEND:latest -n $K8S_NAMESPACE
-          '''
-        }
-      }
+        stage('Deploy to EKS') {
+            steps {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                                      credentialsId: 'aws-main-creds']]) {
+                      sh '''
+                        aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+                        kubectl set image deployment/books-backend books-backend=$ECR_BACKEND:latest -n $K8S_NAMESPACE
+                        kubectl set image deployment/books-frontend books-frontend=$ECR_FRONTEND:latest -n $K8S_NAMESPACE
+                      '''
+              }
+            }
     }
+    
   }
   post {
     failure {
