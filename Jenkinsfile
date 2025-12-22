@@ -34,6 +34,17 @@ pipeline {
         '''
       }
     }
+
+     stage('Verify AWS Auth') {
+            steps {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                                    credentialsId: 'aws-main-creds']]) {
+                        sh 'aws sts get-caller-identity'
+                }
+          }
+      }
+
+
     stage('Deploy to EKS') {
       steps {
         withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: env.AWS_CREDENTIALS]]) {
