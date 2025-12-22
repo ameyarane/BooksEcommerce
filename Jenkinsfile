@@ -20,7 +20,7 @@ pipeline {
       steps {
         sh '''
           aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_BACKEND
-          docker build -t $ECR_BACKEND:latest ./Backend/BooksEcommerce.Api
+          docker build -f Backend/BooksEcommerce.Api/Dockerfile -t $ECR_BACKEND:latest .
           docker push $ECR_BACKEND:latest
         '''
       }
