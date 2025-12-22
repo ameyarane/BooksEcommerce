@@ -19,7 +19,7 @@ pipeline {
     stage('Backend Build & Push') {
       steps {
         sh '''
-          $(aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_BACKEND)
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_BACKEND
           docker build -t $ECR_BACKEND:latest ./Backend/BooksEcommerce.Api
           docker push $ECR_BACKEND:latest
         '''
@@ -28,7 +28,7 @@ pipeline {
     stage('Frontend Build & Push') {
       steps {
         sh '''
-          $(aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_FRONTEND)
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_FRONTEND
           docker build -t $ECR_FRONTEND:latest ./Frontend
           docker push $ECR_FRONTEND:latest
         '''
