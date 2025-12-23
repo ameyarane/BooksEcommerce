@@ -44,20 +44,32 @@ pipeline {
           }
       }
 
-        stage('Deploy to EKS') {
+      stage('Deploy to EKS') {
           steps {
             withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
-                              credentialsId: 'aws-main-creds']]) {
+              credentialsId: 'aws-main-creds']]) {
               sh '''
                 export KUBECONFIG=/var/lib/jenkins/.kube/config
                 aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
-                kubectl set image deployment/books-backend books-backend=$ECR_BACKEND:latest -n $K8S_NAMESPACE
-                kubectl set image deployment/books-frontend books-frontend=$ECR_FRONTEND:latest -n $K8S_NAMESPACE
+
+                # Deploy backend if not exists
+                if ! kubectl get deployment books-backend -n $K8S_NAMESPACE; then
+                  kubectl apply -f Backend/k8s/deployment.yaml
+                else
+                  kubectl set image deployment/books-backend books-backend=$ECR_BACKEND:latest -n $K8S_NAMESPACE
+                fi
+
+                # Deploy frontend if not exists
+                if ! kubectl get deployment books-frontend -n $K8S_NAMESPACE; then
+                  kubectl apply -f Frontend/k8s/deployment.yaml
+                else
+                  kubectl set image deployment/books-frontend books-frontend=$ECR_FRONTEND:latest -n $K8S_NAMESPACE
+                fi
               '''
             }
           }
-        }
-
+      }
+ 
     
   }
   post {
