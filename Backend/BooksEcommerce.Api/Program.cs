@@ -14,7 +14,8 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins("http://localhost:3000",
+    "http://a34385d90a2b1448189c9605a011936e-2117317455.eu-west-1.elb.amazonaws.com")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
