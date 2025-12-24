@@ -20,4 +20,4 @@ spec:
             - containerPort: 80
           env:
             - name: ConnectionStrings__DefaultConnection
-              value: "Server=ec2-34-250-77-60.eu-west-1.compute.amazonaws.com,1433;Database=BooksEcommerceDb;User Id=sa;Password=Cover@2025;Encrypt=False;"
+              value: "Server=172.31.36.10,1433;Database=BooksEcommerceDb;User Id=sa;Password=Cover@2025;Encrypt=False;"
