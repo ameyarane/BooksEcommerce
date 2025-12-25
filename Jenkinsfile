@@ -55,6 +55,11 @@ pipeline {
               export KUBECONFIG=/var/lib/jenkins/.kube/config
               aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
 
+            # Always ensure correct IRSA annotation for EBS CSI controller
+              kubectl annotate serviceaccount ebs-csi-controller-sa \
+              -n kube-system \
+	            eks.amazonaws.com/role-arn=arn:aws:iam::949527796968:role/EKS-EBS-CSI-controller --overwrite
+
               # --- SQL Server: apply PVC, Deployment, Service ---
               kubectl apply -f Backend/k8s/mssql-pvc.yaml
               kubectl apply -f Backend/k8s/mssql-deployment.yaml
