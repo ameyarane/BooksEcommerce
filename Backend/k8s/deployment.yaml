@@ -18,7 +18,8 @@ spec:
           image: 949527796968.dkr.ecr.eu-west-1.amazonaws.com/books-backend:latest
           ports:
             - containerPort: 80
-          # Only this section changes (rest is the same as your current deployment)
           env:
             - name: ConnectionStrings__DefaultConnection
               value: "Server=mssql-service,1433;Database=BooksEcommerceDb;User Id=sa;Password=Cover@2025;Encrypt=False;"
+            - name: AllowedOrigins
+              value: "http://frontend-url-1,http://frontend-url-2"

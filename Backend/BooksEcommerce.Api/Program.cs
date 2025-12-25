@@ -14,12 +14,17 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:3000",
-    "http://a07182bde779542cd8a6f733da0ff719-1544916205.eu-west-1.elb.amazonaws.com")
+        // Get from config/env: CSV string like "https://frontend1,https://frontend2"
+        var origins = builder.Configuration
+            .GetValue<string>("AllowedOrigins")?
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries) ?? Array.Empty<string>();
+
+        policy.WithOrigins(origins)
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
+
 // ---------------------
 
 // --- Swagger setup ---

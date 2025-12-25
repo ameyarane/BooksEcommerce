@@ -23,7 +23,7 @@ Backend/BooksEcommerce.Tests/obj/
 # Frontend Node/React
 Frontend/node_modules/
 Frontend/build/
-Frontend/.env
+
 
 # Logs, system files
 *.log
