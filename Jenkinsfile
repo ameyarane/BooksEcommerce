@@ -48,51 +48,78 @@ pipeline {
       }
 
       stage('Deploy to EKS') {
-        steps {
-          withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
-            credentialsId: 'aws-main-creds']]) {
-            sh '''
-              export KUBECONFIG=/var/lib/jenkins/.kube/config
-              aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+          steps {
+            withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+              credentialsId: 'aws-main-creds']]) {
+              sh '''
+                export KUBECONFIG=/var/lib/jenkins/.kube/config
+                aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
 
-            # Always ensure correct IRSA annotation for EBS CSI controller
-              kubectl annotate serviceaccount ebs-csi-controller-sa \
-              -n kube-system \
-	            eks.amazonaws.com/role-arn=arn:aws:iam::949527796968:role/EKS-EBS-CSI-controller --overwrite
+                # Always ensure correct IRSA annotation for EBS CSI controller
+                kubectl annotate serviceaccount ebs-csi-controller-sa \
+                  -n kube-system \
+                  eks.amazonaws.com/role-arn=arn:aws:iam::949527796968:role/EKS-EBS-CSI-controller --overwrite
 
-              # --- SQL Server: apply PVC, Deployment, Service ---
-              kubectl apply -f Backend/k8s/mssql-pvc.yaml
-              kubectl apply -f Backend/k8s/mssql-deployment.yaml
-              kubectl apply -f Backend/k8s/mssql-service.yaml
+                # --- SQL Server: apply PVC, Deployment, Service ---
+                kubectl apply -f Backend/k8s/mssql-pvc.yaml
+                kubectl apply -f Backend/k8s/mssql-deployment.yaml
+                kubectl apply -f Backend/k8s/mssql-service.yaml
 
-              # Deploy backend if not exists, otherwise update image
-              if ! kubectl get deployment books-backend -n $K8S_NAMESPACE; then
-                kubectl apply -f Backend/k8s/deployment.yaml
-              else
-                kubectl set image deployment/books-backend books-backend=$ECR_BACKEND:latest -n $K8S_NAMESPACE
-              fi
+                # Deploy backend if not exists, otherwise update image
+                if ! kubectl get deployment books-backend -n $K8S_NAMESPACE; then
+                  kubectl apply -f Backend/k8s/deployment.yaml
+                else
+                  kubectl set image deployment/books-backend books-backend=$ECR_BACKEND:latest -n $K8S_NAMESPACE
+                fi
 
-              # Set/Update AllowedOrigins environment variable in backend deployment
-	            kubectl set env deployment/books-backend AllowedOrigins=$ALLOWED_ORIGINS -n $K8S_NAMESPACE
-              
-              # Always apply backend service (creates or updates)
-              kubectl apply -f Backend/k8s/service.yaml
+                # Always apply backend service (creates or updates)
+                kubectl apply -f Backend/k8s/service.yaml
 
-              # Deploy frontend if not exists, otherwise update image
-              if ! kubectl get deployment books-frontend -n $K8S_NAMESPACE; then
-                kubectl apply -f Frontend/k8s/deployment.yaml
-              else
-                kubectl set image deployment/books-frontend books-frontend=$ECR_FRONTEND:latest -n $K8S_NAMESPACE
-              fi
+                # Set/Update AllowedOrigins environment variable in backend deployment
+                kubectl set env deployment/books-backend AllowedOrigins=$ALLOWED_ORIGINS -n $K8S_NAMESPACE
 
-              # Always apply frontend service (creates or updates)
-              kubectl apply -f Frontend/k8s/service.yaml
-            '''
+                # --- WAIT FOR BACKEND LOADBALANCER EXTERNAL-IP ---
+                echo "Waiting for backend LoadBalancer EXTERNAL-IP..."
+                for i in {1..20}; do
+                  BACKEND_API_URL=$(kubectl get svc books-backend -n $K8S_NAMESPACE -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+                  if [ ! -z "$BACKEND_API_URL" ]; then
+                    echo "Backend API URL found: $BACKEND_API_URL"
+                    break
+                  fi
+                  echo "Waiting for backend EXTERNAL-IP... ($i/20)"
+                  sleep 15
+                done
+
+                if [ -z "$BACKEND_API_URL" ]; then
+                  echo "ERROR: Backend LoadBalancer EXTERNAL-IP not found after waiting!"
+                  exit 1
+                fi
+
+                # --- BUILD FRONTEND WITH DYNAMIC API ENDPOINT ---
+                echo "REACT_APP_API_BASE=http://$BACKEND_API_URL/api/books" > ./Frontend/.env
+                cd Frontend
+                npm ci
+                npm run build
+                cd ..
+
+                # --- Build and Push Frontend Image ---
+                aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_FRONTEND
+                docker build -t $ECR_FRONTEND:latest ./Frontend
+                docker push $ECR_FRONTEND:latest
+
+                # Deploy frontend if not exists, otherwise update image
+                if ! kubectl get deployment books-frontend -n $K8S_NAMESPACE; then
+                  kubectl apply -f Frontend/k8s/deployment.yaml
+                else
+                  kubectl set image deployment/books-frontend books-frontend=$ECR_FRONTEND:latest -n $K8S_NAMESPACE
+                fi
+
+                # Always apply frontend service (creates or updates)
+                kubectl apply -f Frontend/k8s/service.yaml
+              '''
+            }
           }
         }
-    }
-
- 
     
   }
   post {
