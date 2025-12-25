@@ -16,7 +16,7 @@ export default function BookList() {
 
   return (
     <div>
-      <div className="books-catalog-title">Books-Catalog</div>
+      <div className="books-catalog-title">Books Catalog</div>
       <table className="books-table">
         <thead>
           <tr>
