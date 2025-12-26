@@ -78,6 +78,13 @@ pipeline {
                 # Set/Update AllowedOrigins environment variable in backend deployment
                 kubectl set env deployment/books-backend AllowedOrigins=$ALLOWED_ORIGINS -n $K8S_NAMESPACE
 
+                # --- RUN EF CORE MIGRATION JOB ---
+                echo "Running EF Core migrations..."
+                kubectl delete job efcore-migrate -n $K8S_NAMESPACE || true
+                kubectl apply -f Backend/k8s/efcore-migrate-job.yaml
+                kubectl wait --for=condition=complete --timeout=180s job/efcore-migrate -n $K8S_NAMESPACE
+                kubectl logs job/efcore-migrate -n $K8S_NAMESPACE
+
                 # --- WAIT FOR BACKEND LOADBALANCER EXTERNAL-IP ---
                 echo "Waiting for backend LoadBalancer EXTERNAL-IP..."
                 for i in {1..20}; do
@@ -120,6 +127,7 @@ pipeline {
             }
           }
         }
+
     
   }
   post {
