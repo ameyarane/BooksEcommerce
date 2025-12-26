@@ -83,29 +83,29 @@ pipeline {
               kubectl set env deployment/books-backend AllowedOrigins=$ALLOWED_ORIGINS -n $K8S_NAMESPACE
 
               # --- WAIT FOR SQL SERVER TO BE READY ---
-              echo "Waiting for SQL Server pod to be Ready..."
-              kubectl wait --for=condition=ready pod -l app=mssql -n $K8S_NAMESPACE --timeout=300s
+              # echo "Waiting for SQL Server pod to be Ready..."
+              # kubectl wait --for=condition=ready pod -l app=mssql -n $K8S_NAMESPACE --timeout=300s
 
               # --- RUN EF CORE MIGRATION JOB ---
-              echo "Running EF Core migrations..."
-              kubectl delete job efcore-migrate -n $K8S_NAMESPACE || true
-              kubectl apply -f Backend/k8s/efcore-migrate-job.yaml
-              set +e
-              kubectl wait --for=condition=complete --timeout=180s job/efcore-migrate -n $K8S_NAMESPACE
-              MIGRATE_STATUS=$?
-              kubectl logs job/efcore-migrate -n $K8S_NAMESPACE
-              if [ $MIGRATE_STATUS -ne 0 ]; then
-                echo "ERROR: EF Core migration job failed or timed out!"
-                kubectl describe job efcore-migrate -n $K8S_NAMESPACE
-                # Optionally, also get pod name and show last logs, for deep debug
-                MIGRATE_POD=$(kubectl get pods -n $K8S_NAMESPACE -l job-name=efcore-migrate -o jsonpath='{.items[0].metadata.name}')
-                if [ ! -z "$MIGRATE_POD" ]; then
-                  kubectl describe pod $MIGRATE_POD -n $K8S_NAMESPACE
-                  kubectl logs $MIGRATE_POD -n $K8S_NAMESPACE
-                fi
-                exit 1
-              fi
-              set -e
+              # echo "Running EF Core migrations..."
+              # kubectl delete job efcore-migrate -n $K8S_NAMESPACE || true
+              # kubectl apply -f Backend/k8s/efcore-migrate-job.yaml
+              # set +e
+              # kubectl wait --for=condition=complete --timeout=180s job/efcore-migrate -n $K8S_NAMESPACE
+              # MIGRATE_STATUS=$?
+              # kubectl logs job/efcore-migrate -n $K8S_NAMESPACE
+              # if [ $MIGRATE_STATUS -ne 0 ]; then
+              #   echo "ERROR: EF Core migration job failed or timed out!"
+              #   kubectl describe job efcore-migrate -n $K8S_NAMESPACE
+              #   # Optionally, also get pod name and show last logs, for deep debug
+              #   MIGRATE_POD=$(kubectl get pods -n $K8S_NAMESPACE -l job-name=efcore-migrate -o jsonpath='{.items[0].metadata.name}')
+              #   if [ ! -z "$MIGRATE_POD" ]; then
+              #     kubectl describe pod $MIGRATE_POD -n $K8S_NAMESPACE
+              #     kubectl logs $MIGRATE_POD -n $K8S_NAMESPACE
+              #   fi
+              #   exit 1
+              # fi
+              # set -e
 
               # --- WAIT FOR BACKEND LOADBALANCER EXTERNAL-IP ---
               echo "Waiting for backend LoadBalancer EXTERNAL-IP..."
