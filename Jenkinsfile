@@ -55,6 +55,10 @@ pipeline {
                 export KUBECONFIG=/var/lib/jenkins/.kube/config
                 aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
 
+                # Ensure EBS CSI controller service account exists before annotating
+                kubectl get serviceaccount ebs-csi-controller-sa -n kube-system || \
+                  kubectl create serviceaccount ebs-csi-controller-sa -n kube-system
+
                 # Always ensure correct IRSA annotation for EBS CSI controller
                 kubectl annotate serviceaccount ebs-csi-controller-sa \
                   -n kube-system \
