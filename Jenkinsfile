@@ -109,7 +109,7 @@ pipeline {
 
               # --- WAIT FOR BACKEND LOADBALANCER EXTERNAL-IP ---
               echo "Waiting for backend LoadBalancer EXTERNAL-IP..."
-              for i in {1..20}; do
+              for i in {1..40}; do
                 BACKEND_API_URL=$(kubectl get svc books-backend -n $K8S_NAMESPACE -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
                 if [ ! -z "$BACKEND_API_URL" ]; then
                   echo "Backend API URL found: $BACKEND_API_URL"
