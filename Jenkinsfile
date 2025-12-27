@@ -1,4 +1,4 @@
-[pipeline {
+pipeline {
   agent any
 
   environment {
@@ -9,7 +9,7 @@
     K8S_NAMESPACE = 'default'
     AWS_CREDENTIALS = credentials('aws-main-creds') 
     BACKEND_API_URL = 'a5cde2fc5d38347a39392f0d8d460951-1244432574.eu-west-1.elb.amazonaws.com'
-    ALLOWED_ORIGINS = 'http://a5b1a98e2a2e94a25afff3d3c0963788-408042466.eu-west-1.elb.amazonaws.com'
+    ALLOWED_ORIGINS = 'http://frontend-url-1,http://frontend-url-2,http://a5b1a98e2a2e94a25afff3d3c0963788-408042466.eu-west-1.elb.amazonaws.com'
   }
 
   stages {
@@ -160,4 +160,3 @@
     }
   }
 }
-]
