@@ -33,7 +33,21 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "BooksEcommerce API", Version = "v1" });
 });
-// ---------------------
+
+// ---- MIGRATION ENTRYPOINT ----
+if (args.Length == 2 && args[0].ToLower() == "database" && args[1].ToLower() == "update")
+{
+    Console.WriteLine("Running EF Core migrations...");
+    var host = builder.Build();
+    using (var scope = host.Services.CreateScope())
+    {
+        var db = scope.ServiceProvider.GetRequiredService<BooksDbContext>();
+        db.Database.Migrate();
+    }
+    Console.WriteLine("Migration complete.");
+    return; // Exit after migration.
+}
+// --------------------------------
 
 var app = builder.Build();
 
@@ -49,7 +63,6 @@ app.UseHttpsRedirection();
 
 // Enable CORS (must be before UseAuthorization and before endpoints)
 app.UseCors();
-
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
